@@ -1,0 +1,810 @@
+/* ================================================================
+   LearningAnalysis 独立样式（紫色主题）
+   引入方式：在 LearningAnalysis.vue 中 import './learning-analysis.css'
+   ================================================================ */
+
+/* ===== 容器 ===== */
+.learning-dashboard {
+    display: grid !important;
+    gap: 18px !important;
+    max-width: 1240px;
+    margin: 0 auto;
+    color: #1E293B;
+}
+
+/* ===== 顶部横幅 ===== */
+.learning-dashboard .hero,
+.learning-dashboard .student-summary {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    padding: 28px 34px !important;
+    border: 0 !important;
+    border-radius: 16px !important;
+    color: #fff !important;
+    background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%) !important;
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.25) !important;
+}
+
+.learning-dashboard .hero h2,
+.learning-dashboard .student-summary h2 {
+    margin: 6px 0 !important;
+    font-size: 28px !important;
+    color: #fff !important;
+}
+
+.learning-dashboard .hero p,
+.learning-dashboard .student-summary p {
+    max-width: 760px;
+    margin: 0 !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+    line-height: 1.65;
+}
+
+.learning-dashboard .hero > div > span,
+.learning-dashboard .student-summary > div > span {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 1px;
+}
+
+/* ===== 按钮 ===== */
+.learning-dashboard button {
+    font: inherit;
+    cursor: pointer;
+}
+
+.learning-dashboard .refresh,
+.learning-dashboard .primary,
+.learning-dashboard .secondary {
+    min-height: 36px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.learning-dashboard .refresh {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    transition: all 0.2s;
+}
+.learning-dashboard .refresh:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.2);
+}
+.learning-dashboard .refresh:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.learning-dashboard .primary {
+    border: 1px solid #6366F1;
+    background: #6366F1;
+    color: #fff;
+}
+.learning-dashboard .primary:hover {
+    background: #4F46E5;
+}
+
+.learning-dashboard .secondary {
+    border: 1px solid #C7D2FE;
+    background: #EEF2FF;
+    color: #4338CA;
+}
+.learning-dashboard .secondary:hover {
+    background: #E0E7FF;
+}
+
+/* ===== 卡片 ===== */
+.learning-dashboard .iq-card {
+    background: #fff;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.learning-dashboard .section {
+    display: block !important;
+    padding: 22px 24px !important;
+}
+
+.learning-dashboard .section-head {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.learning-dashboard .section-head h3 {
+    margin: 0 !important;
+    color: #1E293B !important;
+    font-size: 18px;
+}
+
+.learning-dashboard .section-head p {
+    margin: 4px 0 0 !important;
+    color: #64748B !important;
+    font-size: 13px;
+}
+
+/* ===== 加载 & 空状态 ===== */
+.learning-dashboard .loading,
+.learning-dashboard .empty {
+    padding: 36px;
+    text-align: center;
+    color: #64748B;
+}
+
+.learning-dashboard .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #E2E8F0;
+    border-top: 3px solid #6366F1;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+}
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ===== 概览卡片 ===== */
+.learning-dashboard .overview-cards,
+.learning-dashboard .source-board {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+}
+
+.learning-dashboard .overview-cards > div,
+.learning-dashboard .source-board > div {
+    display: grid !important;
+    gap: 4px;
+    padding: 18px 20px !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 10px !important;
+    background: #fff !important;
+}
+
+.learning-dashboard .overview-cards b,
+.learning-dashboard .source-board b {
+    font-size: 26px;
+    color: #6366F1;
+}
+
+.learning-dashboard .overview-cards span,
+.learning-dashboard .source-board span {
+    font-size: 13px;
+    color: #64748B;
+}
+
+.learning-dashboard .overview-cards.three {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+/* ===== 学生列表 ===== */
+.learning-dashboard .student-list {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.learning-dashboard .student-list > button {
+    display: grid !important;
+    grid-template-columns: 40px minmax(120px, 1fr) auto auto 60px 18px !important;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px 14px !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 8px !important;
+    background: #FAFCFF !important;
+    text-align: left;
+    transition: all 0.2s;
+}
+
+.learning-dashboard .student-list > button:hover {
+    border-color: #A5B4FC !important;
+    background: #F5F3FF !important;
+}
+
+.learning-dashboard .avatar {
+    display: grid !important;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #EEF2FF;
+    color: #4338CA;
+    font-weight: 700;
+}
+
+.learning-dashboard .student-name {
+    display: grid !important;
+    gap: 2px;
+}
+
+.learning-dashboard .student-name em {
+    width: max-content;
+    padding: 1px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-style: normal;
+}
+
+.learning-dashboard .source {
+    font-size: 12px;
+    color: #64748B;
+}
+
+.learning-dashboard .student-list strong {
+    color: #6366F1;
+    text-align: right;
+    font-size: 14px;
+}
+
+.learning-dashboard .arrow {
+    font-size: 20px;
+    color: #A5B4FC;
+}
+
+/* ===== 状态标签 ===== */
+.learning-dashboard .stable {
+    background: #DCFCE7;
+    color: #15803D;
+}
+.learning-dashboard .attention {
+    background: #FEE2E2;
+    color: #B91C1C;
+}
+.learning-dashboard .building {
+    background: #FEF3C7;
+    color: #A16207;
+}
+.learning-dashboard .good {
+    color: #059669;
+}
+.learning-dashboard .medium {
+    color: #B45309;
+}
+.learning-dashboard .weak {
+    color: #B91C1C;
+}
+.learning-dashboard .sample {
+    color: #94A3B8;
+}
+
+/* ===== 薄弱点网格 ===== */
+.learning-dashboard .weak-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.learning-dashboard .weak-grid article {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px !important;
+    border-left: 3px solid #6366F1;
+    background: #F5F3FF;
+    border-radius: 6px;
+}
+
+.learning-dashboard .weak-grid article > div {
+    display: grid !important;
+    gap: 4px;
+}
+.learning-dashboard .weak-grid span {
+    font-size: 12px;
+    color: #64748B;
+}
+.learning-dashboard .weak-grid strong {
+    font-size: 20px;
+}
+
+/* ===== 学生摘要 ===== */
+.learning-dashboard .student-summary.compact-summary {
+    padding: 20px 26px !important;
+    border: 1px solid #E2E8F0 !important;
+    color: #1E293B !important;
+    background: #fff !important;
+}
+
+.learning-dashboard .compact-summary h2 {
+    font-size: 24px !important;
+    color: #1E293B !important;
+}
+.learning-dashboard .compact-summary p {
+    color: #64748B !important;
+}
+.learning-dashboard .compact-summary > div > span {
+    color: #6366F1 !important;
+}
+
+.learning-dashboard .score-pill {
+    display: grid !important;
+    min-width: 100px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    background: #EEF2FF;
+    text-align: center;
+}
+
+.learning-dashboard .score-pill b {
+    font-size: 26px;
+    color: #4338CA;
+}
+.learning-dashboard .score-pill span {
+    font-size: 11px;
+    color: #64748B;
+}
+
+/* ===== 章节完成 ===== */
+.learning-dashboard .chapter-completion {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+}
+
+.learning-dashboard .chapter-completion > article {
+    padding: 14px 16px;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    background: #FAFCFF;
+}
+
+.learning-dashboard .chapter-completion header {
+    display: flex !important;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.learning-dashboard .chapter-completion header b {
+    font-size: 14px;
+    color: #1E293B;
+}
+.learning-dashboard .chapter-completion header strong {
+    font-size: 12px;
+}
+
+.learning-dashboard .chapter-completion > article > div {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.learning-dashboard .chapter-completion section {
+    display: grid !important;
+    gap: 2px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    background: #EEF2FF;
+}
+
+.learning-dashboard .chapter-completion section span,
+.learning-dashboard .chapter-completion section em,
+.learning-dashboard .chapter-completion small {
+    font-size: 11px;
+    color: #64748B;
+    font-style: normal;
+}
+
+.learning-dashboard .chapter-completion section b {
+    font-size: 18px;
+    color: #4338CA;
+}
+
+.learning-dashboard .chapter-completion small {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+}
+.learning-dashboard .chapter-completion small b {
+    color: #1E293B;
+}
+
+/* ===== 两栏布局 ===== */
+.learning-dashboard .split {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+/* ===== 题型列表 ===== */
+.learning-dashboard .type-list,
+.learning-dashboard .level-list {
+    display: grid !important;
+    gap: 8px;
+}
+
+.learning-dashboard .type-list article,
+.learning-dashboard .level-list article {
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px !important;
+    border-radius: 8px;
+    background: #F8FAFC;
+}
+
+.learning-dashboard .type-icon {
+    display: grid !important;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: #EEF2FF;
+    color: #4338CA;
+}
+
+.learning-dashboard .type-list article > div {
+    display: grid !important;
+    flex: 1;
+}
+
+.learning-dashboard .type-list span,
+.learning-dashboard .level-list span {
+    font-size: 12px;
+    color: #64748B;
+}
+
+.learning-dashboard .type-list strong {
+    font-size: 16px;
+    font-weight: 700;
+    min-width: 50px;
+    text-align: right;
+}
+
+.learning-dashboard .level-list b {
+    min-width: 80px;
+    color: #EAB308;
+    font-size: 14px;
+}
+.learning-dashboard .level-list span {
+    flex: 1;
+    font-size: 13px;
+}
+.learning-dashboard .level-list em {
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 500;
+    min-width: 80px;
+    text-align: right;
+}
+
+/* ===== 学习趋势 ===== */
+.learning-dashboard .legend {
+    display: flex !important;
+    gap: 14px;
+    font-size: 12px;
+}
+.learning-dashboard .legend span:before {
+    content: '';
+    display: inline-block;
+    width: 18px;
+    height: 3px;
+    margin-right: 6px;
+    vertical-align: middle;
+    border-radius: 2px;
+}
+.learning-dashboard .exam-line:before {
+    background: #6366F1;
+}
+.learning-dashboard .adaptive-line:before {
+    background: #10B981;
+}
+
+.learning-dashboard .line-chart {
+    height: 280px;
+    padding: 8px;
+    background: #FAFAFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+}
+.learning-dashboard .line-chart svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+.learning-dashboard .grid-line {
+    stroke: #E2E8F0;
+    stroke-width: 1;
+}
+.learning-dashboard .line-chart text {
+    fill: #94A3B8;
+    font-size: 11px;
+}
+.learning-dashboard .exam-poly {
+    fill: none;
+    stroke: #6366F1;
+    stroke-width: 3;
+}
+.learning-dashboard .adaptive-poly {
+    fill: none;
+    stroke: #10B981;
+    stroke-width: 3;
+}
+.learning-dashboard .exam-dot {
+    fill: #6366F1;
+    stroke: #fff;
+    stroke-width: 2;
+}
+.learning-dashboard .adaptive-dot {
+    fill: #10B981;
+    stroke: #fff;
+    stroke-width: 2;
+}
+.learning-dashboard .date-label {
+    text-anchor: middle;
+    font-size: 10px !important;
+}
+
+.learning-dashboard .trend-notes {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.learning-dashboard .trend-notes span {
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: #F5F3FF;
+    color: #475569;
+    font-size: 13px;
+    line-height: 1.6;
+}
+.learning-dashboard .trend-notes b {
+    color: #1E293B;
+}
+
+/* ===== 错题 ===== */
+.learning-dashboard .wrong-columns {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.learning-dashboard .wrong-columns > section {
+    padding: 14px 16px;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    background: #FAFCFF;
+}
+
+.learning-dashboard .wrong-columns h4 {
+    margin: 0 0 10px;
+    color: #1E293B;
+    font-size: 14px;
+}
+.learning-dashboard .wrong-columns h4 span {
+    float: right;
+    padding: 1px 10px;
+    border-radius: 10px;
+    background: #FEE2E2;
+    color: #B91C1C;
+    font-size: 12px;
+}
+
+.learning-dashboard .wrong-columns article {
+    display: grid !important;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    margin-top: 8px;
+    border-radius: 6px;
+    background: #fff;
+    border: 1px solid #F1F5F9;
+}
+
+.learning-dashboard .wrong-columns article > div {
+    display: grid !important;
+    gap: 4px;
+}
+.learning-dashboard .wrong-columns article b {
+    font-size: 13px;
+    color: #1E293B;
+    line-height: 1.5;
+}
+.learning-dashboard .wrong-columns article span {
+    font-size: 11px;
+    color: #94A3B8;
+}
+
+/* ===== 练习建议 ===== */
+.learning-dashboard .advice > article {
+    display: grid !important;
+    grid-template-columns: 34px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px !important;
+    margin-top: 10px;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    background: #FAFCFF;
+}
+
+.learning-dashboard .number {
+    display: grid !important;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #6366F1;
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.learning-dashboard .advice p {
+    margin: 4px 0 !important;
+    color: #64748B;
+}
+
+/* ===== 解释提示 ===== */
+.learning-dashboard .explain-title {
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+}
+
+.learning-dashboard .explain-trigger {
+    position: relative;
+    display: grid !important;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    border: 1px solid #C7D2FE;
+    border-radius: 50%;
+    color: #6366F1;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: help;
+}
+
+.learning-dashboard .explain-trigger .weak-tooltip {
+    display: none !important;
+    position: absolute;
+    z-index: 12;
+    left: 26px;
+    top: -10px;
+    width: 320px;
+    padding: 14px;
+    border: 1px solid #C7D2FE;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 12px 28px rgba(99, 102, 241, 0.15);
+    color: #1E293B;
+    font-weight: 400;
+}
+
+.learning-dashboard .explain-trigger .weak-tooltip p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: #64748B;
+    line-height: 1.6;
+}
+.learning-dashboard .explain-trigger .weak-tooltip b {
+    font-weight: 600;
+    color: #1E293B;
+}
+
+.learning-dashboard .explain-trigger:hover .weak-tooltip,
+.learning-dashboard .explain-trigger:focus .weak-tooltip {
+    display: block !important;
+}
+
+/* ===== 返回按钮 ===== */
+.learning-dashboard .back {
+    justify-self: start;
+    padding: 6px 16px;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    background: #fff;
+    color: #6366F1;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+.learning-dashboard .back:hover {
+    background: #F5F3FF;
+}
+
+/* ================================================================
+   响应式
+   ================================================================ */
+@media (max-width: 1000px) {
+    .learning-dashboard .chapter-completion {
+        grid-template-columns: 1fr 1fr !important;
+    }
+    .learning-dashboard .student-list {
+        grid-template-columns: 1fr;
+    }
+    .learning-dashboard .student-list > button {
+        grid-template-columns: 40px 1fr auto auto 60px 18px !important;
+    }
+}
+
+@media (max-width: 800px) {
+    .learning-dashboard .hero,
+    .learning-dashboard .student-summary {
+        flex-direction: column;
+        text-align: center;
+        padding: 22px 20px !important;
+    }
+    .learning-dashboard .overview-cards,
+    .learning-dashboard .source-board {
+        grid-template-columns: 1fr 1fr !important;
+    }
+    .learning-dashboard .overview-cards.three {
+        grid-template-columns: 1fr 1fr !important;
+    }
+    .learning-dashboard .split {
+        grid-template-columns: 1fr;
+    }
+    .learning-dashboard .wrong-columns {
+        grid-template-columns: 1fr;
+    }
+    .learning-dashboard .chapter-completion {
+        grid-template-columns: 1fr !important;
+    }
+    .learning-dashboard .student-list > button {
+        grid-template-columns: 40px 1fr 60px 18px !important;
+    }
+    .learning-dashboard .student-list .source {
+        display: none;
+    }
+    .learning-dashboard .trend-notes {
+        grid-template-columns: 1fr;
+    }
+    .learning-dashboard .student-summary {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+    .learning-dashboard .weak-grid {
+        grid-template-columns: 1fr;
+    }
+    .learning-dashboard .advice > article {
+        grid-template-columns: 34px 1fr !important;
+    }
+    .learning-dashboard .advice > article button {
+        grid-column: 2;
+    }
+    .learning-dashboard .explain-trigger .weak-tooltip {
+        left: auto;
+        right: -8px;
+        width: min(300px, 80vw);
+    }
+}
+
+@media (max-width: 540px) {
+    .learning-dashboard .overview-cards,
+    .learning-dashboard .source-board {
+        grid-template-columns: 1fr !important;
+    }
+    .learning-dashboard .overview-cards.three {
+        grid-template-columns: 1fr !important;
+    }
+    .learning-dashboard .section {
+        padding: 14px 16px !important;
+    }
+    .learning-dashboard .hero h2,
+    .learning-dashboard .student-summary h2 {
+        font-size: 22px !important;
+    }
+    .learning-dashboard .score-pill b {
+        font-size: 22px;
+    }
+}

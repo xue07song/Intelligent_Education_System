@@ -14,7 +14,6 @@ npm-debug.log*
 Thumbs.db
 .vscode/settings.json
 
-# Backup git repos (内层仓库的 .git 备份，不提交)
+# Backup git repos
 .git-backend-backup
 .git-frontend-backup
-.git-frontend-baczkup
