@@ -6,20 +6,144 @@ const { execFileSync } = require('child_process');
 const { Document, Packer, Paragraph, TextRun, Tab, PageBreak, AlignmentType, Table, TableRow, TableCell, WidthType, UnderlineType, PageOrientation, convertMillimetersToTwip, LineRuleType, HeightRule, TabStopType } = require('docx');
 const practiceService = require('./practiceService');
 
-const SOFFICE_PATH = 'C:\\Users\\Administrator\\AppData\\Roaming\\TRAE SOLO CN\\ModularData\\ai-agent\\vm\\tools\\bin\\soffice.exe';
+// docx -> pdf 的转换引擎按优先级自动选择：
+//   1) LibreOffice（soffice）—— 跨平台首选，Windows / Linux / Docker 都适用
+//      位置解析顺序：环境变量 SOFFICE_PATH → Windows 常见安装目录 → 系统 PATH
+//   2) Windows 上的 Microsoft Word（COM 自动化）—— 本机已装 Office 时无需额外下载
+//   3) 两者都没有 → 抛出可读的 503 业务错误，而不是裸 ENOENT
+const SOFFICE_CANDIDATES = [
+    path.join(process.env.ProgramFiles || 'C:\\Program Files', 'LibreOffice', 'program', 'soffice.exe'),
+    path.join(process.env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)', 'LibreOffice', 'program', 'soffice.exe'),
+];
+
+const missingPdfEngineError = (detail) => Object.assign(
+    new Error(
+        'PDF 导出需要一个可用的 docx 转换引擎，当前环境既没找到 LibreOffice(soffice)，也没有可用的 Microsoft Word。'
+        + '任选其一即可：① 安装 LibreOffice，并在 .env 用 SOFFICE_PATH 指定 soffice(.exe) 完整路径；'
+        + '② 在 Windows 上安装 Microsoft Word（会自动启用，无需配置）；'
+        + '若暂时不需要 PDF，可改用 docx / xlsx 格式导出。'
+        + (detail ? `（${detail}）` : '')
+    ),
+    { statusCode: 503, errorCode: 50301 }
+);
+
+const findInPath = (names) => {
+    const dirs = String(process.env.PATH || '').split(path.delimiter).filter(Boolean);
+    for (const name of names) {
+        for (const dir of dirs) {
+            const candidate = path.join(dir, name);
+            if (fs.existsSync(candidate)) return candidate;
+        }
+    }
+    return null;
+};
+
+// 返回 soffice 可执行文件绝对路径；未安装则返回 null。
+// 仅当 SOFFICE_PATH 已显式配置但指向不存在的文件时才抛错（属于配置错误，应当暴露）。
+const findSofficePath = () => {
+    const configured = String(process.env.SOFFICE_PATH || '').trim();
+    if (configured) {
+        if (fs.existsSync(configured)) return configured;
+        throw missingPdfEngineError(`SOFFICE_PATH 指向的文件不存在：${configured}`);
+    }
+    const installed = SOFFICE_CANDIDATES.find((candidate) => fs.existsSync(candidate));
+    if (installed) return installed;
+    return findInPath(process.platform === 'win32' ? ['soffice.exe'] : ['soffice', 'libreoffice']);
+};
+
+const convertWithSoffice = (sofficePath, docxPath, pdfPath) => {
+    execFileSync(sofficePath, [
+        '--headless', '--convert-to', 'pdf',
+        '--outdir', path.dirname(pdfPath), docxPath,
+    ], { timeout: 60000, windowsHide: true });
+    if (!fs.existsSync(pdfPath)) throw new Error('PDF 生成失败：LibreOffice 未输出文件');
+};
+
+// 用 Microsoft Word 转换。注意必须用 Activator + GetTypeFromProgID 走纯 IDispatch：
+// 直接 New-Object -ComObject Word.Application 会因 Office 互操作程序集（PIA）加载失败
+// 而报 TYPE_E_CANTLOADLIBRARY (0x80029C4A)，任何属性访问都会失败。
+// 返回 true=转换成功，false=本机没有 Word（应继续降级/报错）。
+const convertWithWord = (docxPath, pdfPath) => {
+    const quote = (value) => `'${String(value).replace(/'/g, "''")}'`;
+    const script = [
+        "$ErrorActionPreference = 'Stop'",
+        // 关掉进度流：否则「正在准备首次使用模块」等记录会以 CLIXML 形式污染后端日志
+        "$ProgressPreference = 'SilentlyContinue'",
+        `$src = ${quote(docxPath)}`,
+        `$dst = ${quote(pdfPath)}`,
+        '$word = $null',
+        'try {',
+        "    $type = [Type]::GetTypeFromProgID('Word.Application')",
+        "    if ($null -eq $type) { Write-Output 'ENGINE_MISSING'; exit 2 }",
+        '    $word = [Activator]::CreateInstance($type)',
+        '    $word.Visible = $false',
+        '    $word.DisplayAlerts = 0',
+        '    $doc = $word.Documents.Open($src, $false, $true)',
+        '    $doc.ExportAsFixedFormat($dst, 17)',
+        '    $doc.Close(0)',
+        "    Write-Output 'OK'",
+        '} catch {',
+        "    Write-Output ('FAIL ' + $_.Exception.Message)",
+        '    exit 1',
+        '} finally {',
+        '    if ($null -ne $word) { try { $word.Quit() } catch { } }',
+        '}',
+    ].join('\n');
+
+    let stdout = '';
+    try {
+        stdout = String(execFileSync('powershell.exe', [
+            '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass',
+            '-EncodedCommand', Buffer.from(script, 'utf16le').toString('base64'),
+        ], {
+            timeout: 120000,
+            windowsHide: true,
+            encoding: 'utf8',
+            // 显式接管 stdout/stderr：默认 stderr 会直接漏进后端日志
+            stdio: ['ignore', 'pipe', 'pipe'],
+        }) || '');
+    } catch (err) {
+        if (err.code === 'ENOENT') return false; // 本机没有 powershell.exe
+        stdout = String(err.stdout || '');
+        if (err.status === 2 || stdout.includes('ENGINE_MISSING')) return false; // 没装 Word
+        throw Object.assign(
+            new Error(`Microsoft Word 转换 PDF 失败：${stdout.trim() || err.message}`),
+            { statusCode: 500, errorCode: 50302 }
+        );
+    }
+    if (!fs.existsSync(pdfPath)) {
+        throw Object.assign(new Error('Microsoft Word 未输出 PDF 文件'), { statusCode: 500, errorCode: 50302 });
+    }
+    return true;
+};
+
+// Word 是单实例 COM 服务，并发导出会互相抢占；soffice 也一并串行以降低资源争用。
+let pdfEngineQueue = Promise.resolve();
+const withPdfEngineLock = (task) => {
+    const run = pdfEngineQueue.then(task, task);
+    pdfEngineQueue = run.then(() => undefined, () => undefined);
+    return run;
+};
+
+const renderPdf = (docxPath, pdfPath) => {
+    const sofficePath = findSofficePath();
+    if (sofficePath) {
+        convertWithSoffice(sofficePath, docxPath, pdfPath);
+        return fs.readFileSync(pdfPath);
+    }
+    if (process.platform === 'win32' && convertWithWord(docxPath, pdfPath)) {
+        return fs.readFileSync(pdfPath);
+    }
+    throw missingPdfEngineError();
+};
 
 const docxToPdf = async (docxBuffer) => {
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'exam-pdf-'));
     const docxPath = path.join(tmpDir, 'temp.docx');
+    const pdfPath = path.join(tmpDir, 'temp.pdf');
     fs.writeFileSync(docxPath, docxBuffer);
     try {
-        execFileSync(SOFFICE_PATH, [
-            '--headless', '--convert-to', 'pdf',
-            '--outdir', tmpDir, docxPath,
-        ], { timeout: 30000, windowsHide: true });
-        const pdfPath = path.join(tmpDir, 'temp.pdf');
-        if (!fs.existsSync(pdfPath)) throw new Error('PDF生成失败：LibreOffice未输出文件');
-        return fs.readFileSync(pdfPath);
+        return await withPdfEngineLock(() => renderPdf(docxPath, pdfPath));
     } finally {
         try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch (_) {}
     }
