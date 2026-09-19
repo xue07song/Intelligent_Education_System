@@ -1,0 +1,8 @@
+﻿=== tunnel log size ===
+0
+=== port 9200 owner ===
+PID 34168 = cpolar
+=== cpolar processes ===
+PID 5996 start 09/19/2026 01:13:31
+PID 34168 start 09/19/2026 12:29:24
+PID 39552 start 09/19/2026 12:34:55

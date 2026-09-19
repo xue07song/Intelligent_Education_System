@@ -1,0 +1,20 @@
+﻿computing gzip size...
+dist/index.html                     0.46 kB 鈹?gzip:   0.34 kB
+dist/assets/index-BFD4fWI-.css    598.39 kB 鈹?gzip:  82.20 kB
+dist/assets/index-BJsllqVs.js   2,637.34 kB 鈹?gzip: 846.61 kB
+
+[32m鉁?built in 1.75s[39m
+vite.cmd : [33m[plugin builtin:vite-reporter] 
+所在位置 行:445 字符: 105
++ ... ronted3.0"; & .\node_modules\.bin\vite.CMD build *> "C:\Users\Adminis ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([33m[plugin builtin:vite-reporte 
+   r] :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://r
+olldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39
+m

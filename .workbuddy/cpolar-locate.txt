@@ -1,0 +1,2 @@
+﻿CMD: D:\cpolar\cpolar.exe
+DIR: D:\cpolar

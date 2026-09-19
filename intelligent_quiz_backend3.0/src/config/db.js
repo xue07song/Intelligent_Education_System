@@ -2,7 +2,8 @@ const mysql = require('mysql2/promise');
 const path = require('path');
 
 const envPath = path.resolve(__dirname, '../../.env');
-const envResult = require('dotenv').config({ path: envPath });
+// override: true —— 以项目 .env 为准，避免终端会话中遗留的同名（可能为空）环境变量导致配置被跳过
+const envResult = require('dotenv').config({ path: envPath, override: true });
 
 if (envResult.error && envResult.error.code !== 'ENOENT') {
     throw envResult.error;

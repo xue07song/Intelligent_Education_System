@@ -1,0 +1,2 @@
+﻿time="2026-09-19T12:51:15+08:00" level=info msg="[:tunnel server module] Tunnel established at http://363c2d3e.r39.cpolar.top"
+time="2026-09-19T12:51:15+08:00" level=info msg="[:tunnel server module] Tunnel established at https://363c2d3e.r39.cpolar.top"

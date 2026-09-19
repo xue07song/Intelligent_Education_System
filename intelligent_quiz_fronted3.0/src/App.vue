@@ -239,8 +239,16 @@
           </button>
           <nav class="iq-breadcrumb">
             <span class="breadcrumb-home" @click="goHome">首页</span>
-            <span class="crumb-sep">/</span>
-            <span class="breadcrumb-current">{{ currentBreadcrumb }}</span>
+            <template v-for="(segment, index) in breadcrumbSegments" :key="`${index}-${segment.label}`">
+              <span class="crumb-sep">/</span>
+              <span
+                v-if="segment.routeName"
+                class="breadcrumb-link"
+                :title="`跳转到${segment.label}`"
+                @click="goCrumb(segment.routeName)"
+              >{{ segment.label }}</span>
+              <span v-else class="breadcrumb-current">{{ segment.label }}</span>
+            </template>
           </nav>
         </div>
         <!-- 右上角只保留头像和姓名，功能移至左下角下拉菜单 -->
@@ -313,7 +321,7 @@ import { ref, computed, provide, readonly, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 
 // ===== 路由：页面身份的唯一来源就是地址 =====
-import { ROUTE_NAMES } from '@/router/routes';
+import { ROUTE_NAMES, routes } from '@/router/routes';
 import {
   goExam,
   goRoleHome,
@@ -653,6 +661,42 @@ const avatarChar = computed(() => {
  * 「没有匹配分支时返回 ''」一致；而这些地址会被守卫立刻重定向走，用户看不到这一瞬。
  */
 const currentBreadcrumb = computed(() => route.meta?.crumb || '');
+
+/**
+ * 可点击面包屑：把 `meta.crumb`（如「出卷与学生管理 / 主观题复核」）按「 / 」拆段。
+ *
+ * - 最后一段是**当前页**，只作展示不渲染成链接（人已经在这页上了）；
+ * - 前面的组段（如「出卷与学生管理」）渲染成链接，落点取「路由表顺序里该组下
+ *   第一条当前角色可进的路由」—— 路由表顺序即侧栏出现顺序，教师落在「试卷列表」；
+ *   「智能组卷」这类 `roles: ['teacher']` 的路由对管理员自动跳过，不会把人送进守卫。
+ * - 单段面包屑（题库管理 / 用户管理 / 注册审核 / 个人中心…）没有组段，行为不变。
+ *
+ * `meta.crumb` 的字符串本身一字不改 —— guard-matrix 仍按原文断言，这里只是**消费**它。
+ */
+const breadcrumbSegments = computed(() => {
+  const crumb = route.meta?.crumb || '';
+  if (!crumb) return [];
+  const parts = crumb.split(' / ').map((part) => part.trim()).filter(Boolean);
+  const role = currentUser.value?.role;
+  return parts.map((label, index) => {
+    if (index === parts.length - 1) return { label, routeName: null };
+    const prefix = `${label} / `;
+    const landing = routes.find(
+      (item) =>
+        typeof item.meta?.crumb === 'string' &&
+        item.meta.crumb.startsWith(prefix) &&
+        item.meta.roles?.includes(role),
+    );
+    return { label, routeName: landing?.name || null };
+  });
+});
+
+/** 点击面包屑组段跳转（复用 nav.js 的统一入口，同页重复点击静默忽略）。 */
+const goCrumb = (name) => {
+  if (!name) return;
+  goRoute(name);
+  sidebarOpen.value = false;
+};
 
 /**
  * 「开始答题」——**学生端唯一入口**（试卷列表「开始答题」、题目复盘「重新练习」，
@@ -1447,6 +1491,13 @@ onUnmounted(() => {
   cursor: pointer;
 }
 .breadcrumb-home:hover {
+  color: #6366F1;
+}
+.breadcrumb-link {
+  color: #94A3B8;
+  cursor: pointer;
+}
+.breadcrumb-link:hover {
   color: #6366F1;
 }
 .crumb-sep {
